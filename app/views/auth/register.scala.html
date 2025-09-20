@@ -1,0 +1,11 @@
+@()(implicit req: framework.Request[_])
+
+@main("Register") {
+  <script src='@routes.AssetsController.versioned("svelte/auth/register.js")'></script>
+  <link rel="stylesheet" href='@routes.AssetsController.versioned("svelte/auth/register.css")'>
+  <div id="app"></div>
+
+  <script>
+    new Register.default({target: document.getElementById('app')});
+  </script>
+}

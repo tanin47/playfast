@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel"/>
+
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+      <layout class="ch.qos.logback.classic.PatternLayout">
+        <pattern>%highlight(%level) %magenta(%date{HH:mm:ss}) %yellow(%logger{15}) - %msg%n</pattern>
+      </layout>
+    </encoder>
+  </appender>
+
+  <logger name="com.zaxxer.hikari" level="OFF"/>
+
+  <logger name="play" level="INFO"/>
+  <logger name="application" level="INFO"/>
+  <logger name="play.api.db.evolutions" level="DEBUG"/>
+
+  <!--    <logger name="slick.jdbc.JdbcBackend.statementAndParameter"  level="DEBUG" />-->
+  <!--    <logger name="slick.jdbc.JdbcBackend.benchmark" level="DEBUG" />-->
+
+  <root level="INFO">
+    <appender-ref ref="STDOUT"/>
+  </root>
+
+</configuration>

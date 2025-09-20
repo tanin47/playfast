@@ -1,0 +1,8 @@
+# https://www.playframework.com/documentation/latest/ScalaI18N
+
+validation.login.email.error.email = The email is invalid.
+validation.login.email.error.notExist = The email isn''t registered. Please register.
+validation.login.password.error.required = The password is required.
+validation.login.password.error.invalid = The password is incorrect.
+
+validation.register.email.error.alreadyExists = The email has previously been registered. Please login.
