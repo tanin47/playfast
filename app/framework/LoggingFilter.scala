@@ -20,7 +20,7 @@ class LoggingFilter @Inject() (
     nextFilter: RequestHeader => Future[Result]
   )(requestHeader: RequestHeader): Future[Result] = {
     val startTime = System.currentTimeMillis
-    val shouldSkip = requestHeader.uri.startsWith("/assets")
+    val shouldSkip = requestHeader.uri.startsWith("/assets") || requestHeader.uri.startsWith("/health-check")
 
     if (!shouldSkip) {
       val userIdOpt = requestHeader.session.get(USER_ID_SESSION_KEY)
