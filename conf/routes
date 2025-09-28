@@ -4,6 +4,7 @@
 # ~~~~
 
 # An example controller showing a sample home page
+GET         /health-check        controllers.HealthCheckController.index()
 GET         /                    controllers.HomeController.index()
 
 GET         /login               controllers.AuthController.login()
