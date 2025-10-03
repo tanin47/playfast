@@ -28,8 +28,10 @@ scalacOptions ++= Seq(
 
 libraryDependencies ++= Seq(
   guice,
+  ws,
   "io.github.tanin47" %% "play3-json-form" % "1.2.0",
   "org.scalatestplus.play" %% "scalatestplus-play" % "7.0.1" % Test,
+  "de.leanovate.play-mockws" %% "play-mockws-3-0" % "3.1.0" % Test,
   "org.playframework" %% "play-slick" % "6.2.0",
   "org.playframework" %% "play-slick-evolutions" % "6.2.0",
   "com.github.tminglei" %% "slick-pg" % "0.23.1",

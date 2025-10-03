@@ -4,16 +4,24 @@
 # ~~~~
 
 # An example controller showing a sample home page
-GET         /health-check        controllers.HealthCheckController.index()
-GET         /                    controllers.HomeController.index()
+GET         /health-check               controllers.HealthCheckController.index()
+GET         /                           controllers.HomeController.index()
 
-GET         /login               controllers.AuthController.login()
-POST        /login               controllers.AuthController.doLogin()
-GET         /logout              controllers.AuthController.logout()
-GET         /register            controllers.AuthController.register()
-POST        /register            controllers.AuthController.doRegister()
+GET         /login                      controllers.AuthController.login()
+POST        /login                      controllers.AuthController.doLogin()
+GET         /logout                     controllers.AuthController.logout()
+GET         /register                   controllers.AuthController.register()
+POST        /register                   controllers.AuthController.doRegister()
+GET         /verify-email               controllers.AuthController.verifyEmail(id: String, token: String)
+POST        /verify-email               controllers.AuthController.doVerifyEmail()
+POST        /resend-verify-email        controllers.AuthController.resendVerifyEmail()
 
-GET         /edit                controllers.UserController.edit()
-POST        /update              controllers.UserController.update()
+GET         /forgot-password            controllers.AuthController.forgotPassword()
+POST        /forgot-password            controllers.AuthController.doForgotPassword()
+GET         /reset-password             controllers.AuthController.resetPassword(id: String, token: String)
+POST        /reset-password             controllers.AuthController.doResetPassword()
 
-GET         /assets/*file        controllers.AssetsController.versioned(path="/public", file: Asset)
+GET         /edit                       controllers.UserController.edit()
+POST        /update                     controllers.UserController.update()
+
+GET         /assets/*file               controllers.AssetsController.versioned(path="/public", file: Asset)

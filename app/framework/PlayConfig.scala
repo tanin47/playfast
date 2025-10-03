@@ -15,6 +15,12 @@ class PlayConfig @Inject() (
 
   private[this] val logger = Logger(getClass)
 
+  val BASE_URL: String = getString("app.baseUrl")
+  val MAILGUN_API_KEY: String = getString("mailgun.apiKey")
+  val MAILGUN_DOMAIN: String = getString("mailgun.domain")
+
+  def makeFullUrl(path: String): String = s"$BASE_URL$path"
+
   def getString(key: String): String = {
     getOptString(key)
       .filter(_.nonEmpty)

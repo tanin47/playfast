@@ -1,58 +1,67 @@
 package base
 
+import base.Base.appConfig
+import ch.qos.logback.classic.Level
 import database.models.User
-import database.services.UserService
-import framework.Instant
+import database.services.{EmailVerificationTokenService, ForgotPasswordTokenService, UserService}
+import framework.{Instant, PlayConfig}
+import mockws.MockWSHelpers.Action
 import org.openqa.selenium.StaleElementReferenceException
 import org.scalatest.exceptions.TestFailedException
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, BeforeAndAfterEach}
+import org.slf4j.LoggerFactory
 import play.api.db.evolutions.EvolutionsApi
 import play.api.db.slick.DatabaseConfigProvider
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.{Application, Configuration, Mode}
+import play.api.libs.json.Json
+import play.api.libs.ws.WSClient
+import play.api.mvc.Results.Ok
+import play.api.test.Helpers.POST
+import play.api.{Configuration, Mode, inject}
 import slick.basic.DatabaseConfig
 import slick.jdbc.JdbcProfile
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.Future
+import play.api.Application
 
 object Base {
   val PORT = 9002
-  val OPEN_AI_REQUEST_CACHE_TABLE = "open_ai_request_test_cache"
   val IS_MAC: Boolean = sys.props("os.name").toLowerCase.contains("mac")
 
   lazy val appConfig: Map[String, Any] = Map(
     "slick.dbs.default.db.properties.url" -> "postgres://play_fast_dev_user:dev@localhost:5432/play_fast_test",
-    "play.evolutions.enabled" -> false
+    "play.evolutions.enabled" -> false,
+    "app.baseUrl" -> s"http://localhost:$PORT"
   )
-
-  lazy val app: Application = new GuiceApplicationBuilder()
-    .configure(Configuration.from(appConfig))
-    .in(Mode.Test)
-    .build()
-
-  case class WhatsappParticipant(
-    phoneNumber: String,
-    nameOpt: Option[String] = None
-  )
-
-  Runtime.getRuntime.addShutdownHook(new Thread() {
-    override def run(): Unit = {
-      import play.api.test.Helpers
-      Helpers.await(app.stop(), 30, TimeUnit.SECONDS)
-    }
-  })
 }
 
 class Base extends AnyFunSpec with BeforeAndAfter with BeforeAndAfterAll with BeforeAndAfterEach with Matchers {
-  lazy val app = Base.app
+  lazy val app: Application = new GuiceApplicationBuilder()
+    .configure(Configuration.from(appConfig))
+    .in(Mode.Test)
+    .overrides(inject.bind[WSClient].to[FakeOrRealWSClient])
+    .build()
 
   lazy val dbConfigProvider: DatabaseConfigProvider = app.injector.instanceOf[DatabaseConfigProvider]
   lazy val dbConfig: DatabaseConfig[JdbcProfile] = dbConfigProvider.get[JdbcProfile]
 
+  lazy val config: PlayConfig = app.injector.instanceOf[PlayConfig]
+  lazy val ws: FakeOrRealWSClient = app.injector.instanceOf[FakeOrRealWSClient]
+
   lazy val userService: UserService = app.injector.instanceOf[UserService]
+  lazy val forgotPasswordTokenService: ForgotPasswordTokenService = app.injector.instanceOf[ForgotPasswordTokenService]
+  lazy val emailVerificationTokenService: EmailVerificationTokenService =
+    app.injector.instanceOf[EmailVerificationTokenService]
+
+  var idRunner: Int = 0
+
+  def genId(): Int = {
+    idRunner += 1
+    idRunner
+  }
 
   def await[T](future: Future[T]): T = {
     import play.api.test.Helpers
@@ -60,7 +69,15 @@ class Base extends AnyFunSpec with BeforeAndAfter with BeforeAndAfterAll with Be
   }
 
   def resetDatabase(): Unit = {
-    import framework.PostgresProfile.api._
+    import framework.PostgresProfile.api.*
+    // Initialize play.api.db.evolutions.DefaultEvolutionsApi, so we can set the log level dynamically.
+    app.injector.instanceOf[EvolutionsApi]
+
+    // Silence the logs from evolutions
+    LoggerFactory
+      .getLogger("play.api.db.evolutions")
+      .asInstanceOf[ch.qos.logback.classic.Logger]
+      .setLevel(Level.INFO)
 
     val db = dbConfig.db
 
@@ -69,18 +86,22 @@ class Base extends AnyFunSpec with BeforeAndAfter with BeforeAndAfterAll with Be
         .as[String]
     })
 
-    tables
-      .filterNot(_ == Base.OPEN_AI_REQUEST_CACHE_TABLE)
-      .foreach { table =>
-        await(db.run {
-          sqlu"""DROP TABLE IF EXISTS "#$table" CASCADE;"""
-        })
-      }
+    tables.foreach { table =>
+      await(db.run {
+        sqlu"""DROP TABLE IF EXISTS "#$table" CASCADE;"""
+      })
+    }
 
     app.injector.instanceOf[EvolutionsApi].applyFor("default")
   }
 
   override def beforeEach(): Unit = {
+    ws.clearMockedRoutes()
+    ws.addMockedRoutes {
+      // Mock Mailgun's endpoint
+      case (POST, s"https://api.mailgun.net/v3/${config.MAILGUN_DOMAIN}/messages") =>
+        Action { req => Ok(Json.obj()) }
+    }
     resetDatabase()
     super.beforeEach()
     Instant.mockTimeForTest(java.time.Instant.parse("2025-09-22T07:00:00Z"))
@@ -109,8 +130,8 @@ class Base extends AnyFunSpec with BeforeAndAfter with BeforeAndAfterAll with Be
   }
 
   def makeUser(
-    email: String = "",
-    password: String = ""
+    email: String = s"test${genId()}@random.email",
+    password: Option[String] = Some("pass")
   ): User = {
     await(
       userService.create(

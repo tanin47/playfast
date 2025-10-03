@@ -1,0 +1,17 @@
+@(user: database.models.User, token: database.models.EmailVerificationToken, config: framework.PlayConfig)
+
+<b>Account Verification</b>
+
+<p>Howdy,</p>
+
+<p>
+  Thank you for signing up with Fingertip AI! Please kindly confirm your email address by clicking on the link below:</p>
+
+<p><a href="@config.makeFullUrl(routes.AuthController.verifyEmail(user.id, token.token).url)">
+  Click here to verify your email address</a></p>
+
+<p>If you did not sign up for an Fingertip AI account, you can simply disregard the email.</p>
+
+<p>Thank you!</p>
+
+<p>The Fingertip AI Team</p>

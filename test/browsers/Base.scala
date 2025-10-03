@@ -4,16 +4,16 @@ import base.Base.IS_MAC
 import database.models.User
 import framework.Instant.MockedTimeChangeListener
 import framework.{BaseController, Instant}
+import org.openqa.selenium.*
 import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
 import org.openqa.selenium.logging.{LogType, LoggingPreferences}
-import org.openqa.selenium.*
 import play.api.mvc.{DefaultSessionCookieBaker, Session}
 import play.api.test.TestServer
 
 import java.util.logging.Level
 import scala.jdk.CollectionConverters.ListHasAsScala
 
-object Base {
+trait Base extends base.Base with MockedTimeChangeListener {
   lazy val webDriver: ChromeDriver = {
     val options = new ChromeOptions()
     if (sys.env.get("HEADLESS").contains("true")) {
@@ -21,6 +21,7 @@ object Base {
       println("Running Chrome in the headless mode")
     }
 
+    options.addArguments("--guest")
     options.addArguments("--disable-extensions")
     options.addArguments("--disable-web-security")
     options.addArguments("--window-size=1280,800")
@@ -33,19 +34,11 @@ object Base {
 
     new ChromeDriver(options)
   }
-}
 
-trait Base extends base.Base with MockedTimeChangeListener {
-  import Base.*
-  val testServer: TestServer = {
-    val s = TestServer(
-      port = base.Base.PORT,
-      application = base.Base.app
-    )
-    s.start()
-
-    s
-  }
+  lazy val testServer: TestServer = TestServer(
+    port = base.Base.PORT,
+    application = app
+  )
 
   def mockedTimeChanged(time: Instant): Unit = {
     webDriver.executeScript(
@@ -66,26 +59,45 @@ trait Base extends base.Base with MockedTimeChangeListener {
   }
 
   override def beforeEach(): Unit = {
+    Instant.mockedTimeChangedListener = Some(this)
     super.beforeEach()
 
     go("/")
-    Instant.mockedTimeChangedListener = Some(this)
     webDriver.manage().deleteAllCookies()
   }
 
-  override def afterAll(): Unit = {
+  override def afterEach(): Unit = {
     Instant.mockedTimeChangedListener = None
+    super.afterEach()
+  }
+
+  override def beforeAll(): Unit = {
+    super.beforeAll()
+    testServer.start()
+  }
+
+  override def afterAll(): Unit = {
     webDriver.close()
+    testServer.stop()
     super.afterAll()
   }
 
-  def go(pathOrUrl: String): Unit = {
-    webDriver.get(s"http://localhost:${base.Base.PORT}$pathOrUrl")
+  def waitForFullyLoadedPage(): Unit = {
     waitUntil {
       try {
         val loaded = webDriver.executeScript("return IS_PAGE_FULLY_LOADED_FOR_TEST")
         loaded != null && loaded.asInstanceOf[Boolean]
-      } catch { case _: JavascriptException => false }
+      } catch {
+        case _: JavascriptException => false
+      }
+    }
+  }
+
+  def go(pathOrUrl: String, skipFullLoadedCheck: Boolean = false): Unit = {
+    webDriver.get(s"http://localhost:${base.Base.PORT}$pathOrUrl")
+
+    if (!skipFullLoadedCheck) {
+      waitForFullyLoadedPage()
     }
     mockedTimeChanged(Instant.now())
   }
@@ -162,6 +174,10 @@ trait Base extends base.Base with MockedTimeChangeListener {
     getElem(cssSelector, checkDisplay).get
   }
 
+  def hasElem(cssSelector: String, checkDisplay: Boolean = true): Boolean = {
+    getElem(cssSelector, checkDisplay).isDefined
+  }
+
   def elems(cssSelector: String, checkDisplay: Boolean = true): Seq[WebElement] = {
     waitUntil { getElem(cssSelector, checkDisplay).isDefined }
     webDriver.findElements(By.cssSelector(cssSelector)).asScala.toList
@@ -176,13 +192,23 @@ trait Base extends base.Base with MockedTimeChangeListener {
   }
 
   def getLoggedInUserId(): Option[String] = {
+    waitForFullyLoadedPage()
     val result = webDriver.executeScript("""
-                                           |if (LOGGED_IN_USER) {
-                                           |  return LOGGED_IN_USER.id
-                                           |} else {
+                                           |try {
+                                           |  if (LOGGED_IN_USER) {
+                                           |    return LOGGED_IN_USER.id
+                                           |  } else {
+                                           |    return null
+                                           |  }
+                                           |} catch (e) {
                                            |  return null
                                            |}
                                            |""".stripMargin)
     Option(result.asInstanceOf[String])
   }
+
+  def checkErrorPanel(errors: String*): Unit = {
+    elems(Seq(tid("error-panel"), "p").mkString(" ")).map(_.getText.trim) should be(errors)
+  }
+
 }

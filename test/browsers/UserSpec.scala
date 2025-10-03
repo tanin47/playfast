@@ -1,12 +1,12 @@
 package browsers
 
 import controllers.routes
-import org.openqa.selenium.support.ui.Select
 import database.models.User
+import org.openqa.selenium.support.ui.Select
 
 class UserSpec extends Base {
   it("updates each field") {
-    var user = makeUser(email = "test@test.com", password = "1234")
+    var user = makeUser(email = "test@test.com", password = Some("1234"))
     user.shouldReceiveNewsletter should be(false)
     user.preferredLang should be(None)
 

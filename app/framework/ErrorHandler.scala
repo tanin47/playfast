@@ -20,6 +20,11 @@ class NotFoundException extends Exception
 
 class RedirectException(val path: String) extends Exception
 
+class EarlyExitException(val result: Result) extends Exception
+
+class ExternalServiceException(val status: Int, val message: String)
+    extends Exception(s"Status: $status, message: $message")
+
 @Singleton
 class ErrorHandler @Inject() (
   env: Environment,
@@ -51,11 +56,13 @@ class ErrorHandler @Inject() (
       case e: RedirectException               => logMundaneException(e)
       case e: UnauthorizedException           => logMundaneException(e)
       case e: NotFoundException               => logMundaneException(e)
+      case _: EarlyExitException              =>
       case e                                  =>
         logger.warn(s"${request.method} ${request.uri} (${request.id}): An unknown error was thrown.", e)
     }
 
     exception match {
+      case e: EarlyExitException     => Future(e.result)
       case _: NoSuchElementException => Future(Results.NotFound(views.html.static.notFound()))
       case _: NotFoundException      => Future(Results.NotFound(views.html.static.notFound()))
       case r: RedirectException      => Future(Results.Redirect(r.path))

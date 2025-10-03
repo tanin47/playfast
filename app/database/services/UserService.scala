@@ -1,6 +1,7 @@
 package database.services
 
 import database.models.{User, UserTable}
+import framework.UpdateField.NoUpdate
 import framework.{BaseDbService, Instant, UpdateField}
 import org.postgresql.util.PSQLException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -13,18 +14,24 @@ import scala.concurrent.{ExecutionContext, Future}
 object UserService {
   case class CreateData(
     email: String,
-    password: String,
+    password: Option[String],
     createdAt: Instant = Instant.now()
   )
 
   case class UpdateData(
-    preferredLang: UpdateField[Option[User.PreferredLang]],
-    shouldReceiveNewsletter: UpdateField[Boolean]
+    preferredLang: UpdateField[Option[User.PreferredLang]] = NoUpdate,
+    shouldReceiveNewsletter: UpdateField[Boolean] = NoUpdate,
+    isEmailVerified: UpdateField[Boolean] = NoUpdate,
+    hashedPassword: UpdateField[Option[String]] = NoUpdate
   )
 
   def sanitizeEmail(email: String): String = email.toLowerCase.trim
 
   case object EmailAlreadyExistingException extends Exception
+
+  def hashPassword(password: String): String = {
+    new BCryptPasswordEncoder().encode(password)
+  }
 }
 
 @Singleton
@@ -41,7 +48,8 @@ class UserService @Inject() (
     val entity = User(
       id = "",
       email = data.email,
-      hashedPassword = new BCryptPasswordEncoder().encode(data.password),
+      hashedPassword = data.password.map(hashPassword),
+      isEmailVerified = false,
       preferredLang = None,
       shouldReceiveNewsletter = false,
       createdAt = data.createdAt
@@ -66,7 +74,9 @@ class UserService @Inject() (
 
     val updates = Seq(
       data.preferredLang.toOption.map { v => base.map(_.preferredLang).update(v) },
-      data.shouldReceiveNewsletter.toOption.map { v => base.map(_.shouldReceiveNewsletter).update(v) }
+      data.shouldReceiveNewsletter.toOption.map { v => base.map(_.shouldReceiveNewsletter).update(v) },
+      data.isEmailVerified.toOption.map { v => base.map(_.isEmailVerified).update(v) },
+      data.hashedPassword.toOption.map { v => base.map(_.hashedPassword).update(v) }
     ).flatten
 
     db.run(DBIO.sequence(updates).transactionally).map(_ => ())
@@ -83,5 +93,24 @@ class UserService @Inject() (
     db.run {
       query.filter(_.id === id).result.headOption
     }
+  }
+
+  def updatePassword(id: String, password: Option[String]): Future[Unit] = {
+    update(
+      id = id,
+      data = UpdateData(
+        hashedPassword = UpdateField(password.map(hashPassword)),
+        isEmailVerified = UpdateField(true)
+      )
+    )
+  }
+
+  def verifyEmail(id: String): Future[Unit] = {
+    update(
+      id = id,
+      data = UpdateData(
+        isEmailVerified = UpdateField(true)
+      )
+    )
   }
 }

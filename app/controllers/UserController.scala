@@ -12,10 +12,15 @@ import javax.inject.*
 import scala.concurrent.{ExecutionContext, Future}
 
 object UserController {
-  val UPDATE_FORM: Form[UserService.UpdateData] = Form(
+  case class UpdateData(
+    preferredLang: UpdateField[Option[User.PreferredLang]],
+    shouldReceiveNewsletter: UpdateField[Boolean]
+  )
+
+  val UPDATE_FORM: Form[UpdateData] = Form(
     "validation.login",
-    UserService.UpdateData.apply,
-    Tuples.to[UserService.UpdateData],
+    UpdateData.apply,
+    Tuples.to[UpdateData],
     "preferredLang" -> UpdateField.form(opt(Helpers.enumForm[User.PreferredLang])),
     "shouldReceiveNewsletter" -> UpdateField.form(boolean)
   )
@@ -33,8 +38,16 @@ class UserController @Inject() (userService: UserService, cc: ControllerComponen
   def update(): play.api.mvc.Action[JsValue] = authenticated(parse.json) { implicit req =>
     val data = UPDATE_FORM.bindFromRequest().get
 
-    userService.update(req.loggedInUser.id, data).map { _ =>
-      Ok(Json.obj())
-    }
+    userService
+      .update(
+        id = req.loggedInUser.id,
+        data = UserService.UpdateData(
+          preferredLang = data.preferredLang,
+          shouldReceiveNewsletter = data.shouldReceiveNewsletter
+        )
+      )
+      .map { _ =>
+        Ok(Json.obj())
+      }
   }
 }

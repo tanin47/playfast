@@ -6,3 +6,6 @@ validation.login.password.error.required = The password is required.
 validation.login.password.error.invalid = The password is incorrect.
 
 validation.register.email.error.alreadyExists = The email has previously been registered. Please login.
+
+validation.forgotPassword.email.error.email = The email is invalid.
+validation.forgotPassword.email.error.notExist = The email isn''t registered. Please register.

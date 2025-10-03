@@ -6,7 +6,7 @@ import play.api.libs.json.{JsLookupResult, JsString, JsValue}
 import scala.reflect.{ClassTag, classTag}
 import scala.util.{Success, Try}
 
-sealed trait UpdateField[T] {
+sealed trait UpdateField[+T] {
   def toOption: Option[T] = this match {
     case UpdateField.Update(u) => (Some(u): Option[T])
     case UpdateField.NoUpdate  => None
@@ -17,6 +17,8 @@ object UpdateField {
   val UNSET_KEYWORD = "SET_TO_NULL"
   case class Update[T](value: T) extends UpdateField[T]
   case object NoUpdate extends UpdateField[Nothing]
+
+  def apply[T](v: T): Update[T] = Update(v)
 
   def form[T: ClassTag](mapping: Mapping[T]): Mapping[UpdateField[T]] = new Mapping[UpdateField[T]] {
     def bind(value: JsLookupResult, context: BindContext): Try[UpdateField[T]] = {
