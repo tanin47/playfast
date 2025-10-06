@@ -1,0 +1,17 @@
+@import database.models.User
+@(user: User)(implicit req: framework.Request[_])
+
+@main("Edit profile") {
+  <script src='@routes.AssetsController.versioned("svelte/user/edit.js")'></script>
+  <link rel="stylesheet" href='@routes.AssetsController.versioned("svelte/user/edit.css")'>
+  <div id="app"></div>
+
+  <script>
+          new Edit.default({
+            target: document.getElementById('app'),
+            props: {
+              user: @Html(encode(user))
+            }
+          });
+  </script>
+}

@@ -1,0 +1,11 @@
+@()(implicit req: framework.Request[_])
+
+@main("Login") {
+  <script src='@routes.AssetsController.versioned("svelte/auth/login.js")'></script>
+  <link rel="stylesheet" href='@routes.AssetsController.versioned("svelte/auth/login.css")'>
+  <div id="app"></div>
+
+  <script>
+    new Login.default({target: document.getElementById('app')});
+  </script>
+}

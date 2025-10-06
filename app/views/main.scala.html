@@ -1,0 +1,60 @@
+@import play.filters.csrf.CSRF
+@import play.api.Mode
+@(title: String)(content: Html)(implicit req: framework.Request[_])
+
+<!DOCTYPE html>
+<html lang="en" data-theme="dracula">
+  <head>
+    @* Here's where we render the page title `String`. *@
+    <title>@title</title>
+    <link rel="stylesheet" href="@routes.AssetsController.versioned("stylesheets/tailwindbase.css")">
+    <link rel="shortcut icon" type="image/png" href="@routes.AssetsController.versioned("images/logo.png")">
+    <script src='@routes.AssetsController.versioned("javascripts/versionedAssets.js")'></script>
+
+    <script>
+            window.LOGGED_IN_USER = @req.loggedInUserOpt.map { loggedInUser =>
+            @Html(encode(loggedInUser));
+            }.getOrElse {
+            null;
+            }
+
+            var oldFetch = window.fetch;
+
+            window.fetch = function () {
+              // Some AJAX requests' urls start with `//` (e.g. helpscoutdocs.com). We need to exclude it. Otherwise,
+              // we would hit CORS condition.
+              if (arguments.length >= 1 && !!arguments[0].startsWith && arguments[0].startsWith('/') && !arguments[0].startsWith('//')) {
+              } else {
+                return oldFetch.apply(window, arguments);
+              }
+
+              var args = [...arguments]
+              if (args.length === 1) {
+                args.push({})
+              }
+
+              args[1].headers ||= {};
+              args[1].headers['From-Fetch'] = 'true'
+
+              if (args[1].method === 'POST' || args[1].method === "DELETE" || args[1].method === "PUT") {
+                args[1].headers['Csrf-Token'] = '@CSRF.getToken(req).map(_.value).getOrElse("")';
+              }
+
+              return oldFetch.apply(window, args);
+            };
+
+    </script>
+  </head>
+  <body>@content</body>
+  @if(req.config.env.mode == Mode.Test) {
+    <script>
+            var IS_PAGE_FULLY_LOADED_FOR_TEST = false
+            setTimeout(
+                    () => {
+                      IS_PAGE_FULLY_LOADED_FOR_TEST = true
+                    },
+                    1
+            )
+    </script>
+  }
+</html>
