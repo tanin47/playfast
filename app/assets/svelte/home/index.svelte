@@ -18,6 +18,10 @@ let description = "This is a Svelte-powered application built with Play Framewor
   {:else}
     <a class="link link-primary" href="/login">Login</a>
   {/if}
+  <div class="flex items-center gap-3 text-sm">
+    <a class="link" href="/terms-of-service">Terms Of Service (Example)</a>
+    <a class="link" href="/privacy-policy">Privacy Policy (Example)</a>
+  </div>
 </div>
 
 <style lang="scss">

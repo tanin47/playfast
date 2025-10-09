@@ -15,4 +15,12 @@ class HomeController @Inject() (userService: UserService, cc: ControllerComponen
   def index(): play.api.mvc.Action[AnyContent] = async() { implicit req =>
     Future(Ok(views.html.index()))
   }
+
+  def privacy() = async() { implicit req =>
+    Future(Ok(views.html.static.privacy()))
+  }
+
+  def tos() = async() { implicit req =>
+    Future(Ok(views.html.static.tos()))
+  }
 }

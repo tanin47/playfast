@@ -40,3 +40,11 @@ export async function post(url: string, data: object): Promise<object> {
     throw unknownError
   }
 }
+
+export function invokeOnEnter(fn: () => void): (event: KeyboardEvent) => void {
+  return (event: KeyboardEvent) => {
+    if (event.key === 'Enter' && (event.target as HTMLElement).tagName.toLowerCase() !== 'textarea') {
+      fn();
+    }
+  }
+}

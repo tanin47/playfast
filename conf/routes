@@ -6,6 +6,8 @@
 # An example controller showing a sample home page
 GET         /health-check               controllers.HealthCheckController.index()
 GET         /                           controllers.HomeController.index()
+GET         /privacy-policy             controllers.HomeController.privacy()
+GET         /terms-of-service           controllers.HomeController.tos()
 
 GET         /login                      controllers.AuthController.login()
 POST        /login                      controllers.AuthController.doLogin()
