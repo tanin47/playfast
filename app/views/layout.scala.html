@@ -1,0 +1,13 @@
+@(title: String)(content: Html)
+
+<!DOCTYPE html>
+<html lang="en" data-theme="dracula">
+  <head>
+    @* Here's where we render the page title `String`. *@
+    <title>@title</title>
+    <link rel="stylesheet" href="@routes.AssetsController.versioned("stylesheets/tailwindbase.css")">
+    <link rel="shortcut icon" type="image/png" href="@routes.AssetsController.versioned("images/logo.png")">
+    <script src='@routes.AssetsController.versioned("javascripts/versionedAssets.js")'></script>
+  </head>
+  <body>@content</body>
+</html>

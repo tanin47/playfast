@@ -5,7 +5,7 @@ import database.services.{EmailVerificationTokenService, ForgotPasswordTokenServ
 import framework.*
 import framework.Helpers.makeValidationException
 import givers.form.Form
-import givers.form.Mappings.{email, opt, text}
+import givers.form.Mappings.{email, text}
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, AnyContent}
@@ -55,16 +55,14 @@ object AuthController {
   )
 
   case class ForgotPasswordData(
-    email: String,
-    dummy: Option[String]
+    email: String
   )
 
   val FORGOT_PASSWORD_FORM: Form[ForgotPasswordData] = Form(
     "validation.forgotPassword",
     ForgotPasswordData.apply,
     Tuples.to[ForgotPasswordData],
-    "email" -> email,
-    "dummy" -> opt(text(allowEmpty = false))
+    "email" -> email
   )
 
   case class ResetPasswordData(

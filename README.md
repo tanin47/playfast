@@ -6,13 +6,14 @@ production-ready [PlayFramework](https://www.playframework.com/) template.
 
 You can see the demo here: https://play.nanakorn.com
 
-It comes with libraries and code conventions that help you get started quickly. You can clone the repository, run it
-locally, and deploy a working version within minutes.
+It comes with libraries and code conventions that help you get started quickly.
+Setting up all these components and conventions would take from hours to weeks.
+You can clone the repository, run it locally, run tests, and deploy a working version within minutes.
 
 Here are the main features:
 
-1. Modern JavaScripts framework integration (only Svelte + TailwindCSS for now) with Hot-Module Reloading (HMR) support
-   for local dev.
+1. Modern JavaScripts framework integration (only Svelte + TailwindCSS for now) with Hot-Module Reloading (HMR) and
+   Typescript support for local dev.
 2. Deployment pipeline to Dokploy, which should be easily adaptable to Render.com and Heroku.
 3. Postgres integration that supports Enum.
 4. Test frameworks with browser testing.
