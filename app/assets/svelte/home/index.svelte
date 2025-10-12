@@ -1,7 +1,7 @@
 <script lang="ts">
 import {getVersionedAsset, LOGGED_IN_USER} from "../common/globals";
 
-let title = "Welcome to Our Application";
+let title = "Welcome to PlayFast";
 let description = "This is a Svelte-powered application built with Play Framework";
 </script>
 

@@ -13,6 +13,9 @@ class PlayConfig @Inject() (
   val langs: Langs
 ) {
 
+  val m = new tanin.ejwf.Main()
+  m.start(9091)
+
   private[this] val logger = Logger(getClass)
 
   val BASE_URL: String = getString("app.baseUrl")
