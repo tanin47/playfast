@@ -149,6 +149,12 @@ module.exports = (env, argv) => {
         }
       }
       config.plugins.push(new webpack.HotModuleReplacementPlugin())
+
+      // The below config will make HMR work when a new file is added or removed.
+      config.watchOptions = {
+        aggregateTimeout: 300,
+        poll: 1000
+      }
     }
   } else if (argv.mode === 'none') {
 
