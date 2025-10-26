@@ -7,3 +7,4 @@ logs
 .bloop
 .metals
 metals.sbt
+SYSTEM_RUNNING

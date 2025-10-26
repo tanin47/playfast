@@ -36,6 +36,7 @@ libraryDependencies ++= Seq(
   "org.playframework" %% "play-slick-evolutions" % "6.2.0",
   "com.github.tminglei" %% "slick-pg" % "0.23.1",
   "org.postgresql" % "postgresql" % "42.7.7",
+  "io.github.tanin47" % "backdoor" % "1.1.1",
   "org.springframework.security" % "spring-security-crypto" % "6.5.2",
   ("ch.epfl.scala" %% "scalafix-core" % ScalafixBuildInfo.scalafixVersion).cross(
     CrossVersion.for3Use2_13
