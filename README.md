@@ -10,22 +10,6 @@ It comes with libraries and code conventions that help you get started quickly.
 Setting up all these components and conventions would take from hours to weeks.
 You can clone the repository, run it locally, run tests, and deploy a working version within minutes.
 
-Here are the main features:
-
-1. Modern JavaScripts framework integration (only Svelte + TailwindCSS for now) with Hot-Module Reloading (HMR) and
-   Typescript support for local dev.
-2. Deployment pipeline to Dokploy, which should be easily adaptable to Render.com and Heroku.
-3. Postgres integration that supports Enum.
-4. Test frameworks with browser testing.
-6. Pre-configured scalafmt and scalafix.
-7. (not done yet) Github Actions configuration with sharded tests.
-
-It also includes multiple code conventions that I've used over the years like:
-
-1. Processing a JSON data in POST request and propagating validation errors.
-2. Passing the data between frontend and backend in a semi-strong typed manner.
-3. Accessing a database and avoid the N+1 queries using the hydration pattern.
-
 How to use
 -----------
 
@@ -56,6 +40,32 @@ How to use
 8. Visit http://localhost:9000
 9. `sbt test` to run all tests.
 10. To publish a production Docker image for deployment: `sbt stage docker:publish`
+
+Features
+----------
+
+Here are the main features:
+
+1. Modern JavaScripts framework integration (Svelte + TailwindCSS + DaisyUI) with Hot-Module Reloading (HMR) and
+   Typescript support for local dev.
+2. Deployment pipeline to Dokploy, which should be easily adaptable to Render.com and Heroku.
+3. Postgres integration that supports Enum.
+4. Test frameworks with browser testing.
+6. Pre-configured scalafmt and scalafix.
+7. (not done yet) Github Actions configuration with sharded tests.
+
+It also includes multiple code conventions that I've used over the years like:
+
+1. Processing a JSON data in POST request and propagating validation errors.
+2. Passing the data between frontend and backend in a semi-strong typed manner.
+3. Accessing a database and avoid the N+1 queries using the hydration pattern.
+
+Other small features:
+
+* Support mocking time in test
+* Always redirect to https.
+* [Backdoor](https://github.com/tanin47/backdoor), a database management tool, is installed.
+* Logging is setup to log every request.
 
 Request a feature or have a question?
 --------------------------------------
