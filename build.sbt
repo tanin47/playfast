@@ -40,7 +40,8 @@ libraryDependencies ++= Seq(
   "org.springframework.security" % "spring-security-crypto" % "6.5.2",
   ("ch.epfl.scala" %% "scalafix-core" % ScalafixBuildInfo.scalafixVersion).cross(
     CrossVersion.for3Use2_13
-  ) % ScalafixConfig
+  ) % ScalafixConfig,
+  "org.jobrunr" % "jobrunr" % "8.1.0"
 )
 
 TwirlKeys.templateImports += "framework.Jsonable._"

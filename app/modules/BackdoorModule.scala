@@ -1,14 +1,17 @@
 package modules
 
+import background.JobRunrMain
 import com.google.inject.{AbstractModule, Provider}
 import play.api.inject.ApplicationLifecycle
-import play.api.{Configuration, Logger}
+import play.api.{Application, Configuration, Logger, Mode}
 import tanin.backdoor.BackdoorServer
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class BackdoorServerProvider @Inject() (
+  app: Application,
   config: Configuration,
   lifecycle: ApplicationLifecycle
 )(implicit
@@ -16,23 +19,23 @@ class BackdoorServerProvider @Inject() (
 ) extends Provider[BackdoorServer] {
   private[this] val logger = Logger(this.getClass)
 
-  lazy val backdoorServer: BackdoorServer = {
-    val server = new BackdoorServer(
-      config.get[String]("slick.dbs.default.db.properties.url"),
-      9999
-    )
+  lazy val backdoorServer: BackdoorServer = new BackdoorServer(
+    config.get[String]("slick.dbs.default.db.properties.url"),
+    9999
+  )
 
-    lifecycle.addStopHook(() => Future { server.stop() })
-
-    server.start()
-    server
+  def get(): BackdoorServer = {
+    if (!JobRunrMain.isRunning && app.mode != Mode.Test) {
+      // Not background processing nor test. Starting Backdoor...
+      lifecycle.addStopHook(() => Future { backdoorServer.stop() })
+      backdoorServer.start()
+    }
+    backdoorServer
   }
-
-  def get(): BackdoorServer = backdoorServer
 }
 
 class BackdoorModule extends AbstractModule {
-  override def configure() = {
+  override def configure(): Unit = {
     bind(classOf[BackdoorServer])
       .toProvider(classOf[BackdoorServerProvider])
       .asEagerSingleton()

@@ -37,4 +37,15 @@
 
   </script>
   @content
+  @if(req.config.env.mode == Mode.Test) {
+    <script>
+            var IS_PAGE_FULLY_LOADED_FOR_TEST = false
+            setTimeout(
+                    () => {
+                      IS_PAGE_FULLY_LOADED_FOR_TEST = true
+                    },
+                    1
+            )
+    </script>
+  }
 }
