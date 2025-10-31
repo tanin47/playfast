@@ -1,20 +1,21 @@
 package framework
 
+import scala.compiletime.erasedValue
 import scala.deriving.Mirror
 import scala.util.Try
-import scala.compiletime.erasedValue
 
 object Tuples:
-  /**
-    * Produces a value suitable for case-class unapply:
-    * - For single-parameter case classes, returns Option[Param]
-    * - For multi-parameter case classes, returns Option[(P1, P2, ...)]
+  /** Produces a value suitable for case-class unapply:
+    *   - For single-parameter case classes, returns Option[Param]
+    *   - For multi-parameter case classes, returns Option[(P1, P2, ...)]
     */
   type UnapplyResult[T] = T match
     case h *: EmptyTuple => h
-    case _ => T
+    case _               => T
 
-  inline def to[A <: Product](value: A)(using mirror: Mirror.ProductOf[A]): Option[UnapplyResult[mirror.MirroredElemTypes]] =
+  inline def to[A <: Product](
+    value: A
+  )(using mirror: Mirror.ProductOf[A]): Option[UnapplyResult[mirror.MirroredElemTypes]] =
     Try {
       val tuple = Tuple.fromProductTyped(value)
       inline erasedValue[mirror.MirroredElemTypes] match

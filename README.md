@@ -35,8 +35,10 @@ How to use
 
 - You may need to adjust the credentials `setup_db.sh` to be able to connect to your local Postgres.
 
-7. Open 2 terminal windows. One runs `sbt run` (for Play server), and another runs `npm run hmr` (for Hot-Reloading
-   Module).
+7. Open 3 terminal windows:
+   7.1 Run `sbt run` for Play server (Hot-Reloading enabled).
+   7.2 Run `npm run hmr` for JS/CSS/Svelte (Hot-Reloading enabled).
+   7.3 Run `sbt 'runMain background.JobRunrMain dev'` for background processing. No Hot-Reloading.
 8. Visit http://localhost:9000
 9. `sbt test` to run all tests.
 10. To publish a production Docker image for deployment: `sbt stage docker:publish`
@@ -50,7 +52,8 @@ Here are the main features:
    Typescript support for local dev.
 2. Deployment pipeline to Dokploy, which should be easily adaptable to Render.com and Heroku.
 3. Postgres integration that supports Enum.
-4. Test frameworks with browser testing.
+4. [JobRunr](https://github.com/jobrunr/jobrunr), the background job framework, is installed with a job example.
+5. Test frameworks with browser testing.
 6. Pre-configured scalafmt and scalafix.
 7. (not done yet) Github Actions configuration with sharded tests.
 

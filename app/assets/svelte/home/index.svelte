@@ -22,6 +22,16 @@ let description = "This is a Svelte-powered application built with Play Framewor
     <a class="link" href="/terms-of-service">Terms Of Service (Example)</a>
     <a class="link" href="/privacy-policy">Privacy Policy (Example)</a>
   </div>
+  {#if LOGGED_IN_USER}
+    <div>
+      One TestIncrementDummyCounterWorker has been queued... Please run <code>sbt 'runMain background.JobRunrMain
+      dev'</code> to
+      run background processing.
+    </div>
+    <div>
+      Current dummy counter: {LOGGED_IN_USER.dummyCounter}
+    </div>
+  {/if}
 </div>
 
 <style lang="scss">

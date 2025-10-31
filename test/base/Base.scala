@@ -1,11 +1,16 @@
 package base
 
+import background.JobRunrMain
 import base.Base.appConfig
 import ch.qos.logback.classic.Level
 import database.models.User
 import database.services.{EmailVerificationTokenService, ForgotPasswordTokenService, UserService}
 import framework.{Instant, PlayConfig}
 import mockws.MockWSHelpers.Action
+import org.jobrunr.jobs.Job
+import org.jobrunr.jobs.states.StateName
+import org.jobrunr.storage.StorageProviderUtils.DatabaseOptions
+import org.jobrunr.storage.{Paging, StorageProvider}
 import org.openqa.selenium.StaleElementReferenceException
 import org.scalatest.exceptions.TestFailedException
 import org.scalatest.funspec.AnyFunSpec
@@ -25,6 +30,7 @@ import slick.jdbc.JdbcProfile
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.Future
+import scala.jdk.CollectionConverters.ListHasAsScala
 
 object Base {
   val PORT = 9002
@@ -92,6 +98,12 @@ class Base extends AnyFunSpec with BeforeAndAfter with BeforeAndAfterAll with Be
     }
 
     app.injector.instanceOf[EvolutionsApi].applyFor("default")
+
+    LoggerFactory
+      .getLogger("org.jobrunr")
+      .asInstanceOf[ch.qos.logback.classic.Logger]
+      .setLevel(Level.WARN)
+    app.injector.instanceOf[StorageProvider].setUpStorageProvider(DatabaseOptions.CREATE)
   }
 
   override def beforeEach(): Unit = {
@@ -140,5 +152,29 @@ class Base extends AnyFunSpec with BeforeAndAfter with BeforeAndAfterAll with Be
         )
       )
     )
+  }
+
+  private[this] def getPendingBackgroundJobs(): Seq[Job] = {
+    val storageProvider = app.injector.instanceOf[StorageProvider]
+    Seq(StateName.ENQUEUED, StateName.PROCESSING).flatMap { state =>
+      storageProvider
+        .getJobList(state, Paging.AmountBasedList.ascOnCreatedAt(100000))
+        .asScala
+        .toList
+    }
+  }
+
+  def runAllPendingBackgroundJobs(): Unit = {
+    val storageProvider = app.injector.instanceOf[StorageProvider]
+    getPendingBackgroundJobs()
+      .foreach { job =>
+        job.setAmountOfRetries(0)
+        storageProvider.save(job)
+      }
+
+    val jobRunrMain = new JobRunrMain(app)
+    jobRunrMain.backgroundJobServer.start()
+    waitUntil { getPendingBackgroundJobs().isEmpty }
+    jobRunrMain.backgroundJobServer.stop()
   }
 }

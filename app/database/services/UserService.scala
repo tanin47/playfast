@@ -52,6 +52,7 @@ class UserService @Inject() (
       isEmailVerified = false,
       preferredLang = None,
       shouldReceiveNewsletter = false,
+      dummyCounter = 0,
       createdAt = data.createdAt
     )
 
@@ -67,6 +68,14 @@ class UserService @Inject() (
       case e: PSQLException if matchUniqueConstraintException(e, "user__email") =>
         throw EmailAlreadyExistingException
     }
+  }
+
+  def incrementDummyCounter(id: String): Future[Unit] = {
+    db
+      .run {
+        sqlu"""UPDATE "user" SET dummy_counter = dummy_counter + 1 WHERE id = $id"""
+      }
+      .map { _ => () }
   }
 
   def update(id: String, data: UpdateData): Future[Unit] = {

@@ -1,6 +1,6 @@
 package framework
 
-import givers.form.{BindContext, Mapping, UnbindContext, ValidationException, ValidationMessage}
+import givers.form.*
 import play.api.libs.json.{JsDefined, JsLookupResult, JsString, JsValue}
 
 import scala.reflect.{ClassTag, classTag}
@@ -30,5 +30,4 @@ object Helpers {
 
     def unbind(value: T, context: UnbindContext): JsValue = throw new UnsupportedOperationException()
   }
-
 }

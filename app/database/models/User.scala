@@ -21,6 +21,7 @@ case class User(
   isEmailVerified: Boolean,
   preferredLang: Option[User.PreferredLang],
   shouldReceiveNewsletter: Boolean,
+  dummyCounter: Int,
   createdAt: Instant
 ) extends Jsonable {
   def toJson(): JsObject = Json.obj(
@@ -29,6 +30,7 @@ case class User(
     "isEmailVerified" -> isEmailVerified,
     "preferredLang" -> preferredLang.map(_.toString),
     "shouldReceiveNewsletter" -> shouldReceiveNewsletter,
+    "dummyCounter" -> dummyCounter,
     "createdAt" -> createdAt.toEpochMilli
   )
 
@@ -41,6 +43,7 @@ class UserTable(tag: Tag) extends Table[User](tag, "user") {
   def isEmailVerified: Rep[Boolean] = column[Boolean]("is_email_verified")
   def preferredLang: Rep[Option[PreferredLang]] = column[Option[User.PreferredLang]]("preferred_lang")
   def shouldReceiveNewsletter: Rep[Boolean] = column[Boolean]("should_receive_newsletter")
+  def dummyCounter: Rep[Int] = column[Int]("dummy_counter")
   def createdAt: Rep[Instant] = column[Instant]("created_at")
 
   def * : ProvenShape[User] = (
@@ -50,6 +53,7 @@ class UserTable(tag: Tag) extends Table[User](tag, "user") {
     isEmailVerified,
     preferredLang,
     shouldReceiveNewsletter,
+    dummyCounter,
     createdAt
   ).<>((User.apply _).tupled, User.unapply)
 }

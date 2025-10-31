@@ -6,5 +6,6 @@ export interface User {
   email: string
   preferredLang: PreferredLang | null
   shouldReceiveNewsletter: boolean
+  dummyCounter: number
   createdAt: number
 }
