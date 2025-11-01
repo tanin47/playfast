@@ -2,7 +2,7 @@ package framework
 
 import java.time.temporal.ChronoUnit
 
-type Instant = java.time.Instant
+type Instant = java.time.Instant // scalafix:ok
 
 object Instant {
   trait MockedTimeChangeListener {
@@ -32,4 +32,6 @@ object Instant {
     .getOrElse(
       java.time.Instant.now() // scalafix:ok
     )
+
+  def parse(text: String): Instant = java.time.Instant.parse(text) // scalafix:ok
 }

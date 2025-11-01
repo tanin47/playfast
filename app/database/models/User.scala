@@ -1,12 +1,10 @@
 package database.models
 
 import database.models.User.PreferredLang
-import framework.Jsonable
 import framework.PostgresProfile.api.*
+import framework.{Instant, Jsonable}
 import play.api.libs.json.{JsObject, Json}
 import slick.lifted.{ProvenShape, Rep}
-
-import java.time.Instant
 
 object User {
   enum PreferredLang extends Enum[PreferredLang] {

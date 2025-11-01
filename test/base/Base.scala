@@ -115,7 +115,7 @@ class Base extends AnyFunSpec with BeforeAndAfter with BeforeAndAfterAll with Be
     }
     resetDatabase()
     super.beforeEach()
-    Instant.mockTimeForTest(java.time.Instant.parse("2025-09-22T07:00:00Z"))
+    Instant.mockTimeForTest(Instant.parse("2025-09-22T07:00:00Z"))
   }
 
   private[this] val WAIT_UNTIL_TIMEOUT_MILLIS = 15000

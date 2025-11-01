@@ -1,11 +1,9 @@
 package database.models
 
-import framework.Jsonable
 import framework.PostgresProfile.api.*
+import framework.{Instant, Jsonable}
 import play.api.libs.json.{JsObject, Json}
 import slick.lifted.{ProvenShape, Rep}
-
-import java.time.Instant
 
 case class EmailVerificationToken(
   userId: String,
