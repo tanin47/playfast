@@ -2,11 +2,11 @@ PlayFast: Production-ready PlayFramework Template
 ==================================================
 
 PlayFast is an [omakase-style](https://dhh.dk/2012/rails-is-omakase.html)
-production-ready [PlayFramework](https://www.playframework.com/) template.
+production-ready [PlayFramework](https://www.playframework.com/) template that makes you productive.
 
 You can see the demo here: https://play.nanakorn.com
 
-It comes with libraries and code conventions that help you get started quickly.
+It comes with libraries and code conventions that help you get started quickly and be productive.
 Setting up all these components and conventions would take from hours to weeks.
 You can clone the repository, run it locally, run tests, and deploy a working version within minutes.
 
