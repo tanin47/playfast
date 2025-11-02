@@ -44,7 +44,7 @@ libraryDependencies ++= Seq(
   "org.jobrunr" % "jobrunr" % "8.1.0"
 )
 
-ThisBuild / scalafixDependencies += "io.github.tanin47" %% "scalafix-forbidden-class" % "1.0.0"
+ThisBuild / scalafixDependencies += "io.github.tanin47" %% "scalafix-forbidden-symbol" % "1.0.0"
 
 TwirlKeys.templateImports += "framework.Jsonable._"
 
