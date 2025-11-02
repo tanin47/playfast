@@ -3,6 +3,7 @@ package controllers
 import background.TestIncrementDummyCounterWorkerRequest
 import database.services.UserService
 import framework.{BaseController, ControllerComponents}
+import modules.ClockService
 import org.jobrunr.scheduling.JobRequestScheduler
 import play.api.mvc.AnyContent
 
@@ -13,11 +14,13 @@ import scala.concurrent.{ExecutionContext, Future}
 class HomeController @Inject() (
   userService: UserService,
   cc: ControllerComponents,
-  jobScheduler: JobRequestScheduler
+  jobScheduler: JobRequestScheduler,
+  clockService: ClockService
 )(implicit ec: ExecutionContext)
     extends BaseController(cc) {
 
   def index(): play.api.mvc.Action[AnyContent] = async() { implicit req =>
+    println("In controller: " + clockService.now())
     req.loggedInUserOpt.foreach { loggedInUser =>
       jobScheduler.enqueue(TestIncrementDummyCounterWorkerRequest(loggedInUser.id))
     }
