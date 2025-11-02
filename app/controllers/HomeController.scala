@@ -6,6 +6,7 @@ import framework.{BaseController, ControllerComponents}
 import org.jobrunr.scheduling.JobRequestScheduler
 import play.api.mvc.AnyContent
 
+import java.time.Instant
 import javax.inject.*
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -18,6 +19,7 @@ class HomeController @Inject() (
     extends BaseController(cc) {
 
   def index(): play.api.mvc.Action[AnyContent] = async() { implicit req =>
+    println("In controller: " + Instant.now())
     req.loggedInUserOpt.foreach { loggedInUser =>
       jobScheduler.enqueue(TestIncrementDummyCounterWorkerRequest(loggedInUser.id))
     }
