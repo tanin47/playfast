@@ -18,7 +18,8 @@ semanticdbVersion := scalafixSemanticdb.revision
 scalacOptions ++= Seq(
   "-feature", // Emit warning and location for usages of features that should be imported explicitly.
   "-Xfatal-warnings", // Fail if there's a warning.
-  "-Wnonunit-statement", // Don't allow unused non-Unit expression.
+  // TODO: Metals / IntelliJ sometimes are buggy about -Wnonunit-statement
+  // "-Wnonunit-statement", // Don't allow unused non-Unit expression.
   // Silence warnings on the generated code (e.g. from Play) because we don't have control over it.
   // Also, silence the warnings on the test code.
   "-Wconf:msg=.*unused value of type.*&src=(target|test)/.*:silent",
