@@ -17,7 +17,7 @@ class AssetsController @Inject() (
 
   override def versioned(path: String, file: Assets.Asset): Action[AnyContent] = Action.async { req =>
     if (
-      env.mode == Mode.Dev &&
+      (env.mode == Mode.Dev || env.mode == Mode.Test) &&
       (
         file.name.startsWith("svelte_") ||
           file.name.startsWith("svelte/") ||

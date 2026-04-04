@@ -86,6 +86,8 @@ class Base extends AnyFunSpec with BeforeAndAfter with BeforeAndAfterAll with Be
 
     val db = dbConfig.db
 
+    await(db.run(SimpleDBIO { ctx => ResetPgTypeInfoCache.reset(ctx.connection) }))
+
     val tables = await(db.run {
       sql"SELECT tablename FROM pg_tables WHERE schemaname='public' ORDER BY tablename ASC;"
         .as[String]
@@ -95,6 +97,11 @@ class Base extends AnyFunSpec with BeforeAndAfter with BeforeAndAfterAll with Be
       await(db.run {
         sqlu"""DROP TABLE IF EXISTS "#$table" CASCADE;"""
       })
+    }
+
+    val extensions = await(db.run { sql"SELECT extname FROM pg_extension WHERE extname != 'plpgsql'".as[String] })
+    extensions.foreach { extension =>
+      await(db.run { sqlu"""DROP EXTENSION "#$extension" CASCADE;""" })
     }
 
     app.injector.instanceOf[EvolutionsApi].applyFor("default")
