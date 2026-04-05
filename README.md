@@ -10,6 +10,8 @@ It comes with libraries and code conventions that help you get started quickly a
 Setting up all these components and conventions would take from hours to weeks.
 You can clone the repository, run it locally, run tests, and deploy a working version within minutes.
 
+The showcase website is [BangkokProp.com](https://bangkokprop.com), a Bangkok Property Rentals & Sales website that pulls 4,000+ listings from Facebook Groups.
+
 How to use
 -----------
 
