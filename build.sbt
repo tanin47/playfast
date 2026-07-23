@@ -69,6 +69,13 @@ Compile / packageDoc / publishArtifact := false
 Compile / packageSrc / publishArtifact := false
 Compile / doc / sources := Seq.empty
 
+Universal / mappings := {
+  val universalMappings = (Universal / mappings).value
+  universalMappings filter {
+    case (_, path) => !path.endsWith("dev_secret.conf") && !path.endsWith("application.conf")
+  }
+}
+
 import com.typesafe.sbt.packager.docker.DockerChmodType
 import com.typesafe.sbt.packager.docker.DockerPermissionStrategy
 dockerChmodType := DockerChmodType.UserGroupWriteExecute
