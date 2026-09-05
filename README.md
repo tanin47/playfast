@@ -14,7 +14,7 @@ The showcase websites are:
 * [BangkokProp.com](https://bangkokprop.com): a Bangkok Property Rentals & Sales website that pulls 4,000+ listings from Facebook Groups.
 * [SummerArea.com](https://summerarea.com): a US-based Sublease Rentals website that pulls hundreds of listings from Facebook Groups.
 * [AiAtYourFingertip.com](https://aiatyourfingertip.com): AI Chat at Your Fingertips on Desktop
-* [bookofrevenue](https://bookofrevenue.com): an open-source revenue recognition and analytics for Stripe
+* [Book of Revenue](https://bookofrevenue.com): an open-source revenue recognition and analytics for Stripe
 
 How to use
 -----------
