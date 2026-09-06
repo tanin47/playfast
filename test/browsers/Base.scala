@@ -43,21 +43,26 @@ trait Base extends base.Base with MockedTimeChangeListener {
   )
 
   def mockedTimeChanged(time: Instant): Unit = {
-    webDriver.executeScript(
-      s"""
-         |if (!window.OriginalDate) {
-         |  window.OriginalDate = Date;
-         |}
-         |
-         |Date = function(...args) {
-         |  if (args.length === 0) {
-         |    return new window.OriginalDate(${time.toEpochMilli});
-         |  } else {
-         |    return new window.OriginalDate(...args);
-         |  }
-         |};
-         |Date.now = function() { return ${time.toEpochMilli} };
-         |""".stripMargin
+    webDriver.executeCdpCommand(
+      "Page.addScriptToEvaluateOnNewDocument",
+      java.util.Map.of(
+        "source",
+        s"""
+           |if (!window.OriginalDate) {
+           |  window.OriginalDate = Date;
+           |}
+           |
+           |Date = function(...args) {
+           |  if (args.length === 0) {
+           |    return new window.OriginalDate(${time.toEpochMilli});
+           |  } else {
+           |    return new window.OriginalDate(...args);
+           |  }
+           |};
+           |Date.now = function() { return ${time.toEpochMilli} };
+           |Date.UTC = window.OriginalDate.UTC;
+           |""".stripMargin
+      )
     )
   }
 
