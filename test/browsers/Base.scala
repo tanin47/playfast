@@ -6,7 +6,9 @@ import framework.Instant.MockedTimeChangeListener
 import framework.{BaseController, Instant}
 import org.openqa.selenium.*
 import org.openqa.selenium.chrome.{ChromeDriver, ChromeOptions}
+import org.openqa.selenium.interactions.Actions
 import org.openqa.selenium.logging.{LogType, LoggingPreferences}
+import org.openqa.selenium.support.ui.Select
 import play.api.mvc.{DefaultSessionCookieBaker, Session}
 import play.api.test.TestServer
 
@@ -54,6 +56,7 @@ trait Base extends base.Base with MockedTimeChangeListener {
          |    return new window.OriginalDate(...args);
          |  }
          |};
+         |Date.now = function() { return ${time.toEpochMilli} };
          |""".stripMargin
     )
   }
@@ -157,6 +160,41 @@ trait Base extends base.Base with MockedTimeChangeListener {
   def click(cssSelector: String): Unit = {
     val el = elem(cssSelector)
     el.click()
+  }
+
+  def hover(cssSelector: String, dx: Int, dy: Int): Unit = {
+    val elementToHover = elem(cssSelector)
+    var actions = new Actions(webDriver)
+    actions.moveToElement(elementToHover).moveByOffset(dx, dy).click().perform()
+  }
+
+  def select(cssSelector: String, label: String): Unit = {
+    val el = elem(cssSelector)
+
+    val select = new Select(el)
+    select.selectByVisibleText(label)
+  }
+
+  def enableCursor(): Unit = {
+    webDriver.executeScript(
+      """
+        |var seleniumCursor = document.createElement('div');
+        |      seleniumCursor.id = 'selenium-visual-cursor';
+        |      seleniumCursor.style.position = 'absolute';
+        |      seleniumCursor.style.zIndex = '99999';
+        |      seleniumCursor.style.width = '12px';
+        |      seleniumCursor.style.height = '12px';
+        |      seleniumCursor.style.background = 'red';
+        |      seleniumCursor.style.borderRadius = '50%';
+        |      seleniumCursor.style.pointerEvents = 'none'; // Prevents it from interfering with clicks
+        |      document.body.appendChild(seleniumCursor);
+        |
+        |      document.addEventListener('mousemove', function(e) {
+        |          seleniumCursor.style.left = e.pageX + 'px';
+        |          seleniumCursor.style.top = e.pageY + 'px';
+        |      });
+        |""".stripMargin
+    )
   }
 
   private[this] def getElem(cssSelector: String, checkDisplay: Boolean): Option[WebElement] = {

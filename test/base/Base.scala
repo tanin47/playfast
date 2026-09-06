@@ -39,7 +39,9 @@ object Base {
   lazy val appConfig: Map[String, Any] = Map(
     "slick.dbs.default.db.properties.url" -> "postgres://play_fast_dev_user:dev@localhost:5432/play_fast_test",
     "play.evolutions.enabled" -> false,
-    "app.baseUrl" -> s"http://localhost:$PORT"
+    "app.baseUrl" -> s"http://localhost:$PORT",
+    "mailgun.apiKey" -> "invalid",
+    "mailgun.domain" -> "invalid"
   )
 }
 

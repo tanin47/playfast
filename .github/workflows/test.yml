@@ -1,0 +1,71 @@
+name: test
+
+on:
+  pull_request:
+    branches: [ main ]
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  checks: write
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+    services:
+      postgres:
+        image: postgres:18.4
+        env:
+          POSTGRES_DB: play_fast_test
+          POSTGRES_USER: play_fast_dev_user
+          POSTGRES_PASSWORD: dev
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - uses: browser-actions/setup-chrome@v2
+        with:
+          chrome-version: '151'
+          install-chromedriver: true
+      - uses: actions/setup-java@v4
+        with:
+          distribution: semeru
+          java-version: '25'
+          cache: 'sbt'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Cache the target and node_modules folder
+        uses: actions/cache@v4
+        with:
+          path: |
+            ./target
+            ./node_modules
+          key: ${{ runner.os }}-test-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-test-
+      - name: Install Node modules
+        run: npm install
+      - name: Build
+        run: |
+          rm -rf ./target/test-reports
+          sbt test:compile
+      - name: Run tests
+        run: |
+          npm run hmr >/dev/null 2>&1 &
+          sbt test
+        env:
+          HEADLESS: true
+      - name: Publish Test Report
+        id: report
+        uses: mikepenz/action-junit-report@v6
+        if: success() || failure() # always run even if the previous step fails
+        with:
+          report_paths: './target/test-reports/TEST-*.xml'
