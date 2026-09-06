@@ -2,11 +2,6 @@ name: publish
 
 on:
   workflow_dispatch:
-    inputs:
-      tag:
-        description: 'Tag'
-        required: true
-        type: string
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.inputs.tag }}
@@ -48,5 +43,3 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Publish docker image
         run: sbt clean stage docker:publish
-        env:
-          GIT_TAG: ${{ github.event.inputs.tag }}

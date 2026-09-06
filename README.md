@@ -1,6 +1,8 @@
 PlayFast: Production-ready PlayFramework Template
 ==================================================
 
+[![Test](https://github.com/tanin47/playfast/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/tanin47/book-of-revenue/actions/workflows/test.yml)
+
 PlayFast is an [omakase-style](https://dhh.dk/2012/rails-is-omakase.html)
 production-ready [PlayFramework](https://www.playframework.com/) template that makes you productive.
 
@@ -11,8 +13,11 @@ Setting up all these components and conventions would take from hours to weeks.
 You can clone the repository, run it locally, run tests, and deploy a working version within minutes.
 
 The showcase websites are:
-* [BangkokProp.com](https://bangkokprop.com): a Bangkok Property Rentals & Sales website that pulls 4,000+ listings from Facebook Groups.
-* [SummerArea.com](https://summerarea.com): a US-based Sublease Rentals website that pulls hundreds of listings from Facebook Groups.
+
+* [BangkokProp.com](https://bangkokprop.com): a Bangkok Property Rentals & Sales website that pulls 4,000+ listings from
+  Facebook Groups.
+* [SummerArea.com](https://summerarea.com): a US-based Sublease Rentals website that pulls hundreds of listings from
+  Facebook Groups.
 * [AiAtYourFingertip.com](https://aiatyourfingertip.com): AI Chat at Your Fingertips on Desktop
 * [Book of Revenue](https://bookofrevenue.com): an open-source revenue recognition and analytics for Stripe
 
@@ -22,21 +27,31 @@ How to use
 1. Clone the repository with: `git clone https://github.com/tanin47/playframework-template`
 2. Install jdk, scala, and sbt. [SDKMAN](https://sdkman.io/) is recommended for managing multiple JDKs, and GraalVM
    21.0.7 for JVM.
-  - `sdk install java 21.0.7-graal -y`
-  - `sdk install scala 3.3.5`
-  - `sdk install sbt 1.11.1`
+
+- `sdk install java 21.0.7-graal -y`
+- `sdk install scala 3.3.5`
+- `sdk install sbt 1.11.1`
+
 3. Install node and npm. [NVM](https://github.com/nvm-sh/nvm) is recommended for managing multiple Node versions.
-  - `nvm install 22`, `nvm alias default 22`, and `nvm use 22`
+
+- `nvm install 22`, `nvm alias default 22`, and `nvm use 22`
+
 5. Install Postgres.
-  - Using Homebrew is recommended. Run `brew install postgresql`
-  - Start Postgres with `brew services restart postgresql`
+
+- Using Homebrew is recommended. Run `brew install postgresql`
+- Start Postgres with `brew services restart postgresql`
+
 6. Run `npm install` in order to install all npm packages.
 7. Run `cd setup && ./setup_db.sh` in order to set up the postgres database.
-  - You may need to adjust the credentials `setup_db.sh` to be able to connect to your local Postgres.
+
+- You may need to adjust the credentials `setup_db.sh` to be able to connect to your local Postgres.
+
 7. Open 3 terminal windows:
-  - Run `sbt run` for Play server (Hot-Reloading enabled).
-  - Run `npm run hmr` for JS/CSS/Svelte (Hot-Reloading enabled).
-  - Run `sbt 'runMain background.JobRunrMain dev'` for background processing. No Hot-Reloading.
+
+- Run `sbt run` for Play server (Hot-Reloading enabled).
+- Run `npm run hmr` for JS/CSS/Svelte (Hot-Reloading enabled).
+- Run `sbt 'runMain background.JobRunrMain dev'` for background processing. No Hot-Reloading.
+
 8. Visit http://localhost:9000
 9. `sbt test` to run all tests.
 10. To publish a production Docker image for deployment: `sbt stage docker:publish`
