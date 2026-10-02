@@ -37,7 +37,19 @@ class ErrorHandler @Inject() (
   val logger: Logger = Logger(this.getClass)
 
   override def onNotFound(request: RequestHeader, message: String): Future[Result] = {
-    Future(Results.NotFound(views.html.static.notFound()))
+    if (request.path.endsWith("/")) {
+      // construct a new URI without the slash
+      // request.path doesn't contain query strings
+      // request.uri contains both the path and the query string
+      val uri = request.path.take(request.path.length - 1) + {
+        if (request.path == request.uri) "" // no query string
+        else request.uri.substring(request.path.length)
+      }
+
+      Future(Results.Redirect(uri))
+    } else {
+      Future(Results.NotFound(views.html.static.notFound()))
+    }
   }
 
   override def onServerError(
