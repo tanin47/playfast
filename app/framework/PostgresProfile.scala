@@ -2,7 +2,7 @@ package framework
 
 import com.github.tminglei.slickpg.{ExPostgresProfile, PgArraySupport}
 import slick.ast.BaseTypedType
-import slick.jdbc.SetParameter
+import slick.jdbc.{PositionedParameters, SetParameter}
 import slick.lifted.OptionMapper2
 
 import scala.reflect.ClassTag
@@ -48,6 +48,12 @@ trait PostgresProfile extends ExPostgresProfile with SlickEnumSupport with PgArr
       SetParameter[Seq[Int]]((inputList, params) => inputList.foreach(params.setInt))
     implicit val setSeqLong: SetParameter[Seq[Long]] =
       SetParameter[Seq[Long]]((inputList, params) => inputList.foreach(params.setLong))
+
+    implicit val setEnum: SetParameter[Enum[_]] = new SetParameter[Enum[_]] {
+      def apply(i: Enum[_], pp: PositionedParameters): Unit = {
+        pp.setString(i.toString)
+      }
+    }
   }
 
   override val api: MyAPI.type = MyAPI
