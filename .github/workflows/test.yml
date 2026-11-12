@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v4
       - uses: browser-actions/setup-chrome@v2
         with:
-          chrome-version: '153'
+          chrome-version: '156'
           install-chromedriver: true
       - uses: actions/setup-java@v4
         with:
