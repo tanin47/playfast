@@ -90,7 +90,7 @@ dockerExposedPorts := Seq(9000)
 dockerUsername := Some("tanin47")
 dockerUpdateLatest := false
 dockerAlias := dockerAlias.value.withTag(Some("play"))
-dockerBaseImage := "ibm-semeru-runtimes:open-25-jdk"
+dockerBaseImage := "ibm-semeru-runtimes:open-25-jdk-jammy"
 
 dockerEntrypoint := dockerEntrypoint.value ++ Seq("-Dconfig.file=./conf/prod.conf")
 dockerBuildOptions := dockerBuildOptions.value ++ Seq("--platform=linux/amd64")
